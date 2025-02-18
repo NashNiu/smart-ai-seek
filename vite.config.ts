@@ -17,10 +17,10 @@ export default defineConfig({
     port: 3003,
     proxy: {
       '/apis': {
-        target: 'http://172.16.0.24:50000/',
+        target: 'https://smartseek.ai-mchat.com/apis',
         changeOrigin: true,
         ws: true,
-        rewrite: (path) => path.replace(/^\/apis/, '')
+        rewrite: (path) => path.replace(/^\/apis/, '/')
     }
     }
   },
