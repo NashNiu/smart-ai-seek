@@ -1,0 +1,12 @@
+@import "tailwindcss";
+@config '../../tailwind.config.js';
+
+@layer utilities {
+  .prose {
+    max-width: 80ch;
+  }
+}
+
+.anticon-spin::before, .anticon-spin {
+  display: inline-flex;
+}
