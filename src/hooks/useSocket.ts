@@ -10,8 +10,7 @@ const useSocket = () => {
   const initSocket = () => {
     const url = `${location.protocol === "https:" ? "wss" : "ws"}://${
       location.host
-    }/`;
-    // const url = `/`;
+    }/apis/magic-ws`;
     const rws = new ReconnectingWebSocket(url, [], {
       // connectionTimeout: 1000,
       maxRetries: 4,
