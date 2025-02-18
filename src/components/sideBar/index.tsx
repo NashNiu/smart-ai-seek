@@ -1,5 +1,5 @@
 import collapseImg from "@/assets/imgs/collapse.png";
-import deepSeekImg from "@/assets/imgs/deepSeek.png";
+import deepSeekImg from "@/assets/imgs/deepseek.png";
 import logoImg from "@/assets/imgs/logo.png";
 import menuCloseImg from "@/assets/imgs/menuClose.png";
 import newChatImg from "@/assets/imgs/newChat.png";
@@ -57,7 +57,7 @@ export const WideSidebar: React.FC<WideSidebarProps> = ({
           <span>开启新对话</span>
         </div>
       </div>
-      <div className="">
+      <div className="overflow-y-auto flex-1">
         <ChatList />
       </div>
     </WideContainer>
@@ -129,6 +129,10 @@ const Container = styled.div<{ $collapse: boolean }>`
 `;
 
 const WideContainer = styled.div<{ $showTitle: boolean; $isPC: boolean }>`
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   .title {
     display: ${(props) => (props.$showTitle ? "flex" : "none")};
     justify-content: space-between;
