@@ -14,7 +14,7 @@ declare namespace Chat {
     needScroll: boolean;
     addItem: (newItem: MsgItem) => void;
     removeItem: (itemId: string) => void;
-    updateItem: (itemId: string, content: string) => void;
+    updateItem: (data: Partial<MsgItem>) => void;
     // 给最后一条增加内容
     addLastContent: (content: string) => void;
     setItems: (newItems: MsgItem[]) => void;
@@ -49,4 +49,3 @@ declare namespace Chat {
     updateChat: (data: HistoryListItem) => void;
   }
 }
-

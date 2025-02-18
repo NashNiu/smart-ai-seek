@@ -1,11 +1,12 @@
-import { useChatStore, useUiStore } from "@/store";
-import styled from "styled-components";
-import { Bubble } from "@ant-design/x";
 import logoImg from "@/assets/imgs/logo.png";
+import TypewriterMarkdown from "@/components/other/TypewriterMarkdown";
+import { useChatStore, useUiStore } from "@/store";
+import { tools } from "@/utils";
+import { Bubble } from "@ant-design/x";
 import { Spin } from "antd";
 import markdownit from "markdown-it";
-import { tools } from "@/utils";
 import { useEffect, useRef } from "react";
+import styled from "styled-components";
 const MsgBox = () => {
   const {
     id: currentChatId,
@@ -55,14 +56,20 @@ const MsgBox = () => {
               {answerStatus !== 0 || index !== items.length - 1 ? (
                 <div className="prose">
                   {/* 回答中 */}
-                  {answerStatus === 1 && index === items.length - 1 && <Spin />}
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: md.render(
-                        tools.convertThinkTagToBlockquote(item.content)
-                      ),
-                    }}
-                  ></div>
+                  {answerStatus === 1 && index === items.length - 1 ? (
+                    <>
+                      <Spin />
+                      <TypewriterMarkdown content={item.content} delay={50} />
+                    </>
+                  ) : (
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: md.render(
+                          tools.convertThinkTagToBlockquote(item.content)
+                        ),
+                      }}
+                    ></div>
+                  )}
                 </div>
               ) : (
                 <div className="mt-2">
@@ -94,4 +101,3 @@ const Container = styled.div`
     height: 1px;
   }
 `;
-

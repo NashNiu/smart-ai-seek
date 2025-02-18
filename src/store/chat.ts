@@ -29,10 +29,10 @@ export const currentChat = create<Chat.CurrentChatState>((set) => ({
       }),
     }));
   },
-  updateItem: (itemId: string, newName) =>
+  updateItem: (data) =>
     set((state) => ({
       items: state.items.map((item) =>
-        item.id === itemId ? { ...item, content: newName } : item
+        item.id === data.id ? { ...item, ...data } : item
       ),
     })),
   setItems: (newItems) =>
@@ -84,4 +84,3 @@ export const chatList = create<Chat.HistoryListState>((set) => ({
       ),
     })),
 }));
-
