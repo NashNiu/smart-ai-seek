@@ -3,6 +3,7 @@ declare namespace Chat {
     id: string;
     content: string;
     role: "user" | "assistant";
+    copied?: boolean;
   }
   interface CurrentChatState {
     id: string;
@@ -19,6 +20,7 @@ declare namespace Chat {
     addLastContent: (content: string) => void;
     setItems: (newItems: MsgItem[]) => void;
     clearItems: () => void;
+    clearAfter: (index: string) => void;
     // 提问完
     finishAsk: () => void;
     // 开始回答
@@ -47,5 +49,10 @@ declare namespace Chat {
     removeChat: (chatId: string) => void;
     // 修改
     updateChat: (data: HistoryListItem) => void;
+  }
+  interface AskState {
+    isSearch: boolean;
+    setIsSearch: (isSearch: boolean) => void;
+    toggleSearch: () => void;
   }
 }

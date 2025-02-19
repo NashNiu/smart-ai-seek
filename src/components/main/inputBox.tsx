@@ -22,11 +22,10 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
     items: currentChatItems,
   } = useChatStore.currentChat();
   const { addChat } = useChatStore.chatList();
+  const { isSearch, toggleSearch } = useChatStore.askState();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   // 是否深度思考
   // const [isDeep, setIsDeep] = useState(false);
-  // 是否联网搜索
-  const [isSearch, setIsSearch] = useState(false);
   // 输入内容
   const [inputValue, setInputValue] = useState("");
   // 是否可以发送
@@ -111,7 +110,7 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
           <Button
             color={isSearch ? "primary" : "default"}
             variant="outlined"
-            onClick={() => setIsSearch((isSearch) => !isSearch)}
+            onClick={toggleSearch}
           >
             联网搜索
           </Button>

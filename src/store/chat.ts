@@ -43,6 +43,19 @@ export const currentChat = create<Chat.CurrentChatState>((set) => ({
     set(() => ({
       items: [],
     })),
+  // 清楚当前及以后的聊天记录
+  clearAfter: (id: string) => {
+    set((state) => {
+      const index = state.items.findIndex((item) => item.id === id);
+      if (index !== -1) {
+        return {
+          items: state.items.slice(0, index),
+        };
+      } else {
+        return { items: [] };
+      }
+    });
+  },
   finishAsk: () => set(() => ({ answerStatus: 0 })),
   startAnswer: () => set(() => ({ answerStatus: 1 })),
   endAnswer: () => set(() => ({ answerStatus: 2 })),
@@ -83,4 +96,11 @@ export const chatList = create<Chat.HistoryListState>((set) => ({
         item.id === id ? { ...item, ...rest } : item
       ),
     })),
+}));
+
+// ask state
+export const askState = create<Chat.AskState>((set) => ({
+  isSearch: false,
+  setIsSearch: (isSearch: boolean) => set(() => ({ isSearch })),
+  toggleSearch: () => set((state) => ({ isSearch: !state.isSearch })),
 }));

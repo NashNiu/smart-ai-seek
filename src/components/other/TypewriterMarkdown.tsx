@@ -40,10 +40,10 @@ const TypewriterMarkdown = ({
         setNeedScroll(true);
         // 递归调用，设置下一次触发
         timeoutRef.current = setTimeout(processNextChar, delay);
-        onTypeStateChange?.(false);
+        onTypeStateChange?.(true);
       } else {
         // 通知外部显示完成
-        onTypeStateChange?.(true);
+        onTypeStateChange?.(false);
       }
     };
 

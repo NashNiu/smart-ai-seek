@@ -1,12 +1,18 @@
+import copyImg from "@/assets/imgs/copy.png";
 import logoImg from "@/assets/imgs/logo.png";
+import reloadImg from "@/assets/imgs/reload.png";
 import TypewriterMarkdown from "@/components/other/TypewriterMarkdown";
 import { useChatStore, useUiStore } from "@/store";
 import { tools } from "@/utils";
 import { Bubble } from "@ant-design/x";
-import { Spin } from "antd";
+import { Spin, Tooltip } from "antd";
 import markdownit from "markdown-it";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useContext } from "react";
 import styled from "styled-components";
+import { useCopyToClipboard } from "react-use";
+import { CheckOutlined } from "@ant-design/icons";
+import { SocketContext } from "@/hooks";
+
 const MsgBox = () => {
   const {
     id: currentChatId,
@@ -14,12 +20,20 @@ const MsgBox = () => {
     needScroll,
     setNeedScroll,
     answerStatus,
+    updateItem,
+    clearAfter,
+    finishAsk,
   } = useChatStore.currentChat();
+  const { isSearch } = useChatStore.askState();
   const { height: footerHeight } = useUiStore.useFooterHeight();
+  const { sendMessage } = useContext(SocketContext);
   const md = markdownit({ html: true });
   const containerRef = useRef<HTMLDivElement>(null);
   // 正在输出答案
   const [isTyping, setIsTyping] = useState(false);
+  // 复制
+  const [, copyToClipboard] = useCopyToClipboard();
+
   // 滚动到最底部
   const scrollToBottom = () => {
     if (containerRef.current) {
@@ -29,6 +43,16 @@ const MsgBox = () => {
       });
       setNeedScroll(false);
     }
+  };
+  // 重新生成
+  const regenerate = (id: string, index: number) => {
+    clearAfter(id);
+    const content = items[index - 1].content;
+    finishAsk();
+    sendMessage({
+      text: content,
+      type: isSearch ? "duckgo-input" : "text-input",
+    });
   };
   useEffect(() => {
     if (needScroll) {
@@ -69,13 +93,45 @@ const MsgBox = () => {
                       />
                     </>
                   ) : (
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: md.render(
-                          tools.convertThinkTagToBlockquote(item.content)
-                        ),
-                      }}
-                    ></div>
+                    <>
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: md.render(
+                            tools.convertThinkTagToBlockquote(item.content)
+                          ),
+                        }}
+                      ></div>
+                      <div className="flex gap-2 h-6">
+                        <Tooltip title="复制">
+                          {item.copied ? (
+                            <CheckOutlined className="cursor-pointer w-5 h-5 mt-0 mb-0" />
+                          ) : (
+                            <img
+                              onClick={() => {
+                                copyToClipboard(item.content);
+                                updateItem({ id: item.id, copied: true });
+                                setTimeout(() => {
+                                  updateItem({ id: item.id, copied: false });
+                                }, 2000);
+                              }}
+                              className="cursor-pointer w-5 h-5 mt-0 mb-0"
+                              src={copyImg}
+                              alt=""
+                            />
+                          )}
+                        </Tooltip>
+                        <Tooltip title="重新生成">
+                          <img
+                            onClick={() => {
+                              regenerate(item.id, index);
+                            }}
+                            className="cursor-pointer w-5 h-5 mt-0 mb-0"
+                            src={reloadImg}
+                            alt=""
+                          />
+                        </Tooltip>
+                      </div>
+                    </>
                   )}
                 </div>
               ) : (
