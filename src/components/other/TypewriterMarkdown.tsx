@@ -8,11 +8,12 @@ const md = markdownit({ html: true });
 interface TypewriterMarkdownProps {
   content: string;
   delay?: number;
-  onComplete?: () => void;
+  onTypeStateChange?: (state: boolean) => void;
 }
 const TypewriterMarkdown = ({
   content,
   delay = 100,
+  onTypeStateChange,
 }: TypewriterMarkdownProps) => {
   const { setNeedScroll } = useChatStore.currentChat();
   const [fullContent, setFullContent] = useState(""); // 完整内容
@@ -39,6 +40,10 @@ const TypewriterMarkdown = ({
         setNeedScroll(true);
         // 递归调用，设置下一次触发
         timeoutRef.current = setTimeout(processNextChar, delay);
+        onTypeStateChange?.(false);
+      } else {
+        // 通知外部显示完成
+        onTypeStateChange?.(true);
       }
     };
 

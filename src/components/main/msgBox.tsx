@@ -5,7 +5,7 @@ import { tools } from "@/utils";
 import { Bubble } from "@ant-design/x";
 import { Spin } from "antd";
 import markdownit from "markdown-it";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 const MsgBox = () => {
   const {
@@ -18,6 +18,8 @@ const MsgBox = () => {
   const { height: footerHeight } = useUiStore.useFooterHeight();
   const md = markdownit({ html: true });
   const containerRef = useRef<HTMLDivElement>(null);
+  // 正在输出答案
+  const [isTyping, setIsTyping] = useState(false);
   // 滚动到最底部
   const scrollToBottom = () => {
     if (containerRef.current) {
@@ -55,11 +57,16 @@ const MsgBox = () => {
               <img src={logoImg} alt="avatar" />
               {answerStatus !== 0 || index !== items.length - 1 ? (
                 <div className="prose">
-                  {/* 回答中 */}
-                  {answerStatus === 1 && index === items.length - 1 ? (
+                  {/* 回答中, 最后一个，正在输出 */}
+                  {(answerStatus === 1 || isTyping) &&
+                  index === items.length - 1 ? (
                     <>
                       <Spin />
-                      <TypewriterMarkdown content={item.content} delay={50} />
+                      <TypewriterMarkdown
+                        onTypeStateChange={setIsTyping}
+                        content={item.content}
+                        delay={20}
+                      />
                     </>
                   ) : (
                     <div
