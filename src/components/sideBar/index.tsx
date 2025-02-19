@@ -82,7 +82,7 @@ const SideBar: React.FC = () => {
     <Container $collapse={collapse}>
       {collapse ? (
         <div className="menuBox">
-          <img src={logoImg} onClick={goHome} alt="" />
+          <img className="w-[28px]" src={logoImg} onClick={goHome} alt="" />
           <Tooltip title="打开边栏" placement="right">
             <img
               className="w-[28px]"
