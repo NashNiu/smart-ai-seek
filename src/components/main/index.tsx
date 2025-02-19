@@ -8,12 +8,12 @@ const Main = () => {
   const { list } = useChatStore.chatList();
   const title = list.find((item) => item.id === id)?.title || "";
   return (
-    <div className="flex flex-col pt-5 relative max-w-[800px] mx-auto h-full justify-center">
+    <div className="flex flex-col md:pt-5 pt-5 relative max-w-[800px] mx-auto h-full justify-center">
       {items.length === 0 ? (
         <Welcome />
       ) : (
         <>
-          <Title className="title">{title}</Title>
+          <Title className="title md:block hidden">{title}</Title>
           <div className="flex-1 overflow-auto">
             <MsgBox />
           </div>
