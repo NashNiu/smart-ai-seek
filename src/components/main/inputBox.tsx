@@ -98,7 +98,10 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
           params.type = "pdf-input";
           params.pdf = fileList[0].response?.url;
         } else {
+          // 本地
           params.type = "img-sys-input";
+          // 网络
+          // params.type = "img-net-input";
           params.image = fileList[0].response?.url;
           // params.image =
           //   "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png";
@@ -151,9 +154,11 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
     <Container>
       {fileList.length > 0 && (
         <AttachContainer>
-          <div className="text-[12px] text-gray-600 pl-2 pb-1">
-            仅识别附件中的文字
-          </div>
+          {fileList[0]?.type === "application/pdf" && (
+            <div className="text-[12px] text-gray-600 pl-2 pb-1">
+              仅识别附件中的文字
+            </div>
+          )}
           <div className="flex flex-wrap">
             {fileList.map((item) => (
               <div key={item.uid} className="itemBox">
@@ -240,7 +245,7 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
                     : "/apis/upload-img"
                 }
                 multiple={false}
-                maxCount={5}
+                maxCount={1}
                 fileList={fileList}
                 name="file"
                 accept="image/*,.pdf"
