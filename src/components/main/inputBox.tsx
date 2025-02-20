@@ -98,7 +98,7 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
           params.type = "pdf-input";
           params.pdf = fileList[0].response?.url;
         } else {
-          params.type = "img-input";
+          params.type = "img-sys-input";
           params.image = fileList[0].response?.url;
           // params.image =
           //   "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png";
@@ -149,48 +149,59 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
   useEffect(() => {}, []);
   return (
     <Container>
-      <AttachContainer>
-        {fileList.map((item) => (
-          <div key={item.uid} className="itemBox">
-            <div className="w-10 flex justify-center items-center">
-              {item.status === "error" && (
-                <ExclamationCircleOutlined
-                  style={{ fontSize: "25px", color: "#e42020" }}
-                />
-              )}
-              {item.status === "uploading" && (
-                <LoadingOutlined
-                  style={{ fontSize: "25px", color: "#adadad" }}
-                />
-              )}
-              {item.status === "done" && (
-                <img
-                  className="w-[40px]"
-                  src={item.name.endsWith(".pdf") ? pdfImg : picImg}
-                  alt=""
-                />
-              )}
-            </div>
-            <div className="flex-1 overflow-hidden">
-              <div className="text-[14px] overflow-hidden text-ellipsis whitespace-nowrap">
-                {item.name}
-              </div>
-              <div className="text-[12px] text-gray-500">
-                {tools.formatFileSize(item.size || 0)}
-              </div>
-            </div>
-            <div className="closeIcon">
-              <CloseOutlined
-                style={{ color: "#fff" }}
-                className="text-[12px] "
-                onClick={() =>
-                  setFileList(fileList.filter((i) => i.uid !== item.uid))
-                }
-              />
-            </div>
+      {fileList.length > 0 && (
+        <AttachContainer>
+          <div className="text-[12px] text-gray-600 pl-2 pb-1">
+            仅识别附件中的文字
           </div>
-        ))}
-      </AttachContainer>
+          <div className="flex flex-wrap">
+            {fileList.map((item) => (
+              <div key={item.uid} className="itemBox">
+                <div className="w-10 flex justify-center items-center">
+                  {item.status === "error" && (
+                    <ExclamationCircleOutlined
+                      style={{ fontSize: "25px", color: "#e42020" }}
+                    />
+                  )}
+                  {item.status === "uploading" && (
+                    <LoadingOutlined
+                      style={{ fontSize: "25px", color: "#adadad" }}
+                    />
+                  )}
+                  {item.status === "done" && (
+                    <img
+                      className="w-[40px]"
+                      src={item.name.endsWith(".pdf") ? pdfImg : picImg}
+                      alt=""
+                    />
+                  )}
+                </div>
+                <div className="flex-1 overflow-hidden">
+                  <div className="text-[14px] overflow-hidden text-ellipsis whitespace-nowrap">
+                    {item.name}
+                  </div>
+                  <div className="text-[12px] text-gray-500">
+                    {item.status === "error" ? (
+                      <span className="text-red-500">解析失败</span>
+                    ) : (
+                      <span>{tools.formatFileSize(item.size || 0)} </span>
+                    )}
+                  </div>
+                </div>
+                <div className="closeIcon">
+                  <CloseOutlined
+                    style={{ color: "#fff" }}
+                    className="text-[12px] "
+                    onClick={() =>
+                      setFileList(fileList.filter((i) => i.uid !== item.uid))
+                    }
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </AttachContainer>
+      )}
       <InputContainer>
         <InputBox $isPC={isPC}>
           <textarea
@@ -273,10 +284,9 @@ const Container = styled.div`
   border: 1px solid #dce0e9;
 `;
 const AttachContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
+  padding: 10px;
   .itemBox {
-    margin: 10px 0 10px 10px;
+    /* margin: 10px 0 10px 10px; */
     padding: 5px 15px;
     display: flex;
     align-items: center;

@@ -19,7 +19,7 @@ const Footer = () => {
       <div className="inputContainer">
         <InputBox footerResize={getFooterHeight} />
       </div>
-      <div className="tips">内容由AI生产，请仔细甄别</div>
+      <div className="tips">内容由AI生成，请仔细甄别</div>
     </Container>
   );
 };

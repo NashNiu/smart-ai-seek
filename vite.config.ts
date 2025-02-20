@@ -18,6 +18,7 @@ export default defineConfig({
     proxy: {
       '/apis': {
         target: 'https://smartseek.ai-mchat.com/apis',
+        // target: 'http://192.168.0.44:9998',
         changeOrigin: true,
         ws: true,
         rewrite: (path) => path.replace(/^\/apis/, '/')

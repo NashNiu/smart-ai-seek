@@ -89,7 +89,7 @@ const MsgBox = () => {
                       <TypewriterMarkdown
                         onTypeStateChange={setIsTyping}
                         content={item.content}
-                        delay={20}
+                        delay={10}
                       />
                     </>
                   ) : (
