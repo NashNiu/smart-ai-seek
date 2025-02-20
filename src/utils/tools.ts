@@ -43,3 +43,20 @@ export function convertThinkTagToBlockquote(str: string): string {
   return doc.body.innerHTML;
 }
 
+/**
+ * 换算文件大小
+ * @param bytes 文件大小
+ * @returns 文件大小
+ */
+export function formatFileSize(bytes: number) {
+  if (bytes === 0 || !bytes) return "0 Bytes";
+
+  const units = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+  const exponent = Math.floor(Math.log(bytes) / Math.log(1024));
+
+  return (
+    parseFloat((bytes / Math.pow(1024, exponent)).toFixed(2)) +
+    " " +
+    units[exponent]
+  );
+}

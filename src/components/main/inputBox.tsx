@@ -1,16 +1,30 @@
-import { ArrowUpOutlined } from "@ant-design/icons";
-import { Button, Space } from "antd";
+import {
+  ArrowUpOutlined,
+  PaperClipOutlined,
+  CloseOutlined,
+  LoadingOutlined,
+  ExclamationCircleOutlined,
+} from "@ant-design/icons";
+import { Button, Space, Tooltip, Upload, App } from "antd";
 import { useEffect, useRef, useState, useContext } from "react";
 import { useMedia } from "react-use";
 import styled, { css } from "styled-components";
 import { useChatStore } from "@/store";
 import { tools } from "@/utils";
 import { SocketContext } from "@/hooks";
-
+import { UploadFile } from "antd";
+import pdfImg from "@/assets/imgs/pdf.png";
+import picImg from "@/assets/imgs/pic.png";
 interface InputAreaProps {
   footerResize?: () => void;
 }
+interface UploadResponse {
+  url: string;
+  message: string;
+  status: number;
+}
 const InputArea = ({ footerResize }: InputAreaProps) => {
+  const { message } = App.useApp();
   const { sendMessage } = useContext(SocketContext);
   const {
     addItem,
@@ -20,17 +34,27 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
     id: currentChatId,
     setCurrentChatId,
     items: currentChatItems,
+    endAnswer,
   } = useChatStore.currentChat();
+  const [fileList, setFileList] = useState<UploadFile<UploadResponse>[]>([]);
   const { addChat } = useChatStore.chatList();
   const { isSearch, toggleSearch } = useChatStore.askState();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
-  // 是否深度思考
-  // const [isDeep, setIsDeep] = useState(false);
   // 输入内容
   const [inputValue, setInputValue] = useState("");
   // 是否可以发送
   const [canSend, setCanSend] = useState(false);
   const isPC = useMedia("(min-width: 768px)");
+  const uploadTip = isSearch ? (
+    "联网搜索不支持文件上传"
+  ) : (
+    <div>
+      <div>上传附件(仅识别文字)</div>
+      <div className="text-[12px] text-gray-300">
+        最多1个,最大1M,支持图片和PDF
+      </div>
+    </div>
+  );
   const handleTextInput = () => {
     textAreaRef.current!.style.height = "auto";
     textAreaRef.current!.style.height =
@@ -45,17 +69,47 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
       }
     }
   };
+  const beforeUpload = (file: File) => {
+    if (file.size > 1024 * 1024) {
+      message.error("文件大小不能超过1M");
+      return Upload.LIST_IGNORE;
+    }
+    return true;
+  };
+  const uploadChange = ({ fileList }: any) => {
+    setFileList(fileList);
+    // setFileList(newFileList);
+  };
   const onSend = () => {
     if (!inputValue) return;
     if (answerStatus !== 2) {
       return;
     }
     finishAsk();
-    setInputValue("");
-    sendMessage({
+
+    const params: any = {
       text: inputValue,
-      type: isSearch ? "duckgo-input" : "text-input",
-    });
+    };
+    if (isSearch) {
+      params.type = "duckgo-input";
+    } else {
+      if (fileList.length && fileList[0].status === "done") {
+        if (fileList[0].type === "application/pdf") {
+          params.type = "pdf-input";
+          params.pdf = fileList[0].response?.url;
+        } else {
+          params.type = "img-input";
+          params.image = fileList[0].response?.url;
+          // params.image =
+          //   "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png";
+        }
+      } else {
+        params.type = "text-input";
+      }
+    }
+    sendMessage(params);
+    setInputValue("");
+    setFileList([]);
     const askItem: Chat.MsgItem = {
       id: tools.generateRandomString(12),
       content: inputValue,
@@ -77,65 +131,187 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
     }
     setNeedScroll(true);
   };
+  // 停止生成
+  const stopGenerate = () => {
+    endAnswer();
+    sendMessage({
+      type: "interrupt-signal",
+    });
+  };
   useEffect(() => {
-    if (inputValue) {
+    const imageUrl = fileList[0]?.response?.url;
+    if (inputValue || imageUrl) {
       setCanSend(true);
     } else {
       setCanSend(false);
     }
-  }, [inputValue]);
-
+  }, [inputValue, fileList]);
+  useEffect(() => {}, []);
   return (
     <Container>
-      <InputBox $isPC={isPC}>
-        <textarea
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          ref={textAreaRef}
-          className="textarea"
-          placeholder="请输入内容"
-          onInput={handleTextInput}
-          onKeyDown={handleKeydown}
-        />
-      </InputBox>
-      <div className="actionBox">
-        <Space>
-          {/* <Button
-            color={isDeep ? "primary" : "default"}
-            variant="outlined"
-            onClick={() => setIsDeep((isDeep) => !isDeep)}
-          >
-            深度思考
-          </Button> */}
-          <Button
-            color={isSearch ? "primary" : "default"}
-            variant="outlined"
-            onClick={toggleSearch}
-          >
-            联网搜索
-          </Button>
-        </Space>
-        <Space>
-          {/* <PaperClipOutlined className="rotate-135 text-lg cursor-pointer" /> */}
-          {answerStatus < 2 ? (
-            <Button type="primary" loading></Button>
-          ) : (
-            <Button
-              icon={<ArrowUpOutlined />}
-              type="primary"
-              shape="circle"
-              disabled={!canSend}
-              onClick={onSend}
-            ></Button>
-          )}
-        </Space>
-      </div>
+      <AttachContainer>
+        {fileList.map((item) => (
+          <div key={item.uid} className="itemBox">
+            <div className="w-10 flex justify-center items-center">
+              {item.status === "error" && (
+                <ExclamationCircleOutlined
+                  style={{ fontSize: "25px", color: "#e42020" }}
+                />
+              )}
+              {item.status === "uploading" && (
+                <LoadingOutlined
+                  style={{ fontSize: "25px", color: "#adadad" }}
+                />
+              )}
+              {item.status === "done" && (
+                <img
+                  className="w-[40px]"
+                  src={item.name.endsWith(".pdf") ? pdfImg : picImg}
+                  alt=""
+                />
+              )}
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <div className="text-[14px] overflow-hidden text-ellipsis whitespace-nowrap">
+                {item.name}
+              </div>
+              <div className="text-[12px] text-gray-500">
+                {tools.formatFileSize(item.size || 0)}
+              </div>
+            </div>
+            <div className="closeIcon">
+              <CloseOutlined
+                style={{ color: "#fff" }}
+                className="text-[12px] "
+                onClick={() =>
+                  setFileList(fileList.filter((i) => i.uid !== item.uid))
+                }
+              />
+            </div>
+          </div>
+        ))}
+      </AttachContainer>
+      <InputContainer>
+        <InputBox $isPC={isPC}>
+          <textarea
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            ref={textAreaRef}
+            className="textarea"
+            placeholder="请输入内容"
+            onInput={handleTextInput}
+            onKeyDown={handleKeydown}
+          />
+        </InputBox>
+        <div className="actionBox">
+          <Space>
+            <Tooltip
+              title={
+                fileList.length ? "请先删除文件再开启联网搜索" : "按需搜索网页"
+              }
+            >
+              <Button
+                color={isSearch ? "primary" : "default"}
+                variant={isSearch ? "outlined" : "filled"}
+                onClick={toggleSearch}
+                disabled={fileList.length > 0}
+              >
+                联网搜索
+              </Button>
+            </Tooltip>
+          </Space>
+          <Space>
+            <Tooltip title={uploadTip}>
+              <Upload
+                action={(file) =>
+                  file.type === "application/pdf"
+                    ? "/apis/upload-pdf"
+                    : "/apis/upload-img"
+                }
+                multiple={false}
+                maxCount={5}
+                fileList={fileList}
+                name="file"
+                accept="image/*,.pdf"
+                beforeUpload={beforeUpload}
+                showUploadList={false}
+                onChange={uploadChange}
+              >
+                <Button type="text" shape="circle" disabled={isSearch}>
+                  <PaperClipOutlined className="rotate-135 text-xl cursor-pointer" />
+                </Button>
+              </Upload>
+            </Tooltip>
+            {answerStatus < 2 ? (
+              <Tooltip title="停止生成">
+                <div
+                  className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center cursor-pointer"
+                  onClick={stopGenerate}
+                >
+                  <div className="w-3 h-3 bg-white"></div>
+                </div>
+              </Tooltip>
+            ) : (
+              <Button
+                icon={<ArrowUpOutlined />}
+                type="primary"
+                shape="circle"
+                disabled={!canSend}
+                onClick={onSend}
+              ></Button>
+            )}
+          </Space>
+        </div>
+      </InputContainer>
     </Container>
   );
 };
 
 export default InputArea;
 const Container = styled.div`
+  border-radius: 24px;
+  border: 1px solid #dce0e9;
+`;
+const AttachContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  .itemBox {
+    margin: 10px 0 10px 10px;
+    padding: 5px 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #ebebeb;
+    border-radius: 10px;
+    position: relative;
+    width: 200px;
+    height: 60px;
+    /* overflow: hidden; */
+    cursor: pointer;
+    transition: all 0.3s;
+    &:hover {
+      box-shadow: 0px 0px 0px 0.5px #dce0e9;
+      .closeIcon {
+        display: flex;
+      }
+    }
+    .closeIcon {
+      position: absolute;
+      right: -7px;
+      top: -5px;
+      background-color: #696969;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      padding: 4px;
+      justify-content: center;
+      align-items: center;
+      /* display: flex; */
+      display: none;
+    }
+  }
+`;
+const InputContainer = styled.div`
   background-color: rgba(243, 244, 246, 1);
   box-shadow: 0px 0px 0px 0.5px #dce0e9;
   border-radius: 24px;
@@ -170,4 +346,3 @@ const InputBox = styled.div<{ $isPC?: boolean }>`
     min-height: 60px;
   }
 `;
-

@@ -20,7 +20,7 @@ const useSocket = () => {
       // minReconnectionDelay: 10,
     });
     rws.onopen = () => {
-      console.log("WebSocket opened");
+      setSocket(rws);
     };
     rws.onmessage = (event) => {
       const data = JSON.parse(event.data);
