@@ -1,9 +1,12 @@
 declare namespace Chat {
   interface MsgItem {
     id: string;
-    content: string;
+    content?: string;
     role: "user" | "assistant";
     copied?: boolean;
+    type?: "text-input" | "img-sys-input" | "pdf-input" | "duckgo-input";
+    fileName?: string;
+    size?: string;
   }
   interface CurrentChatState {
     id: string;

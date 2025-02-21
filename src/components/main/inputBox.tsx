@@ -89,13 +89,22 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
     const params: any = {
       text: inputValue,
     };
+    const msgItem: Chat.MsgItem = {
+      id: tools.generateRandomString(12),
+      content: inputValue,
+      role: "user",
+    };
     if (isSearch) {
       params.type = "duckgo-input";
+      msgItem.type = "duckgo-input";
     } else {
       if (fileList.length && fileList[0].status === "done") {
         if (fileList[0].type === "application/pdf") {
           params.type = "pdf-input";
           params.pdf = fileList[0].response?.url;
+          msgItem.type = "pdf-input";
+          msgItem.fileName = fileList[0].name;
+          msgItem.size = tools.formatFileSize(fileList[0].size || 0);
         } else {
           // 本地
           params.type = "img-sys-input";
@@ -104,20 +113,19 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
           params.image = fileList[0].response?.url;
           // params.image =
           //   "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png";
+          msgItem.type = "img-sys-input";
+          msgItem.fileName = fileList[0].name;
+          msgItem.size = tools.formatFileSize(fileList[0].size || 0);
         }
       } else {
         params.type = "text-input";
+        msgItem.type = "text-input";
       }
     }
     sendMessage(params);
     setInputValue("");
     setFileList([]);
-    const askItem: Chat.MsgItem = {
-      id: tools.generateRandomString(12),
-      content: inputValue,
-      role: "user",
-    };
-    addItem(askItem);
+    addItem(msgItem);
     textAreaRef.current!.style.height = "auto";
     footerResize?.();
     // 是否是新的聊天
@@ -125,7 +133,7 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
       // 当前已有聊天
       localStorage.setItem(
         currentChatId,
-        JSON.stringify([...currentChatItems, askItem])
+        JSON.stringify([...currentChatItems, msgItem])
       );
     } else {
       // 新创建的聊天

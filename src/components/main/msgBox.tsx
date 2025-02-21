@@ -12,6 +12,8 @@ import styled from "styled-components";
 import { useCopyToClipboard } from "react-use";
 import { CheckOutlined } from "@ant-design/icons";
 import { SocketContext } from "@/hooks";
+import picImg from "@/assets/imgs/pic.png";
+import pdfImg from "@/assets/imgs/pdf.png";
 
 const MsgBox = () => {
   const {
@@ -69,12 +71,46 @@ const MsgBox = () => {
       {items.map((item, index) => (
         <div key={item.id} className="mt-1">
           {item.role === "user" ? (
-            <div className="flex justify-end">
-              <Bubble
-                className="bg-transparent"
-                classNames={{ content: "!rounded-2xl !bg-[#eff6ff]" }}
-                content={item.content}
-              />
+            <div>
+              {item.type === "img-sys-input" && (
+                <div className="flex justify-end mb-2">
+                  <div className="flex items-center bg-gray-100 rounded-2xl px-4 py-2 gap-2">
+                    <img src={picImg} className="w-6" alt="" />
+                    <div className="flex flex-col space-between">
+                      <span className="max-w-[250px] overflow-hidden text-ellipsis whitespace-nowrap">
+                        {item.fileName}
+                      </span>
+                      <span className="text-gray-500 text-[12px]">
+                        {item.size}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {item.type === "pdf-input" && (
+                <div className="flex justify-end mb-2">
+                  <div className="flex items-center bg-gray-100 rounded-2xl px-4 py-2 gap-2">
+                    <img src={pdfImg} className="w-6" alt="" />
+                    <div className="flex flex-col space-between">
+                      <span className="max-w-[250px] overflow-hidden text-ellipsis whitespace-nowrap">
+                        {item.fileName}
+                      </span>
+                      <span className="text-gray-500 text-[12px]">
+                        {item.size}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {item.content && (
+                <div className="flex justify-end">
+                  <Bubble
+                    className="bg-transparent"
+                    classNames={{ content: "!rounded-2xl !bg-[#eff6ff]" }}
+                    content={item.content}
+                  />
+                </div>
+              )}
             </div>
           ) : (
             <div className="flex justify-start items-start gap-4">
@@ -88,8 +124,8 @@ const MsgBox = () => {
                       <Spin />
                       <TypewriterMarkdown
                         onTypeStateChange={setIsTyping}
-                        content={item.content}
-                        delay={10}
+                        content={item?.content ?? ""}
+                        delay={5}
                       />
                     </>
                   ) : (
@@ -97,7 +133,9 @@ const MsgBox = () => {
                       <div
                         dangerouslySetInnerHTML={{
                           __html: md.render(
-                            tools.convertThinkTagToBlockquote(item.content)
+                            tools.convertThinkTagToBlockquote(
+                              item?.content ?? ""
+                            )
                           ),
                         }}
                       ></div>
@@ -108,7 +146,7 @@ const MsgBox = () => {
                           ) : (
                             <img
                               onClick={() => {
-                                copyToClipboard(item.content);
+                                copyToClipboard(item?.content ?? "");
                                 updateItem({ id: item.id, copied: true });
                                 setTimeout(() => {
                                   updateItem({ id: item.id, copied: false });
