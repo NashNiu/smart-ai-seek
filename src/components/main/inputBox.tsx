@@ -139,7 +139,7 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
       // 新创建的聊天
       const randomId = tools.generateRandomString(15);
       setCurrentChatId(randomId);
-      addChat({ id: randomId, title: inputValue });
+      addChat({ id: randomId, title: inputValue || msgItem.fileName  });
     }
     setNeedScroll(true);
   };
