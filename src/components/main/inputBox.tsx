@@ -81,7 +81,6 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
     // setFileList(newFileList);
   };
   const onSend = () => {
-    if (!inputValue) return;
     if (answerStatus !== 2) {
       return;
     }
@@ -119,6 +118,8 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
       role: "user",
     };
     addItem(askItem);
+    textAreaRef.current!.style.height = "auto";
+    footerResize?.();
     // 是否是新的聊天
     if (currentChatId) {
       // 当前已有聊天
@@ -149,7 +150,6 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
       setCanSend(false);
     }
   }, [inputValue, fileList]);
-  useEffect(() => {}, []);
   return (
     <Container>
       {fileList.length > 0 && (

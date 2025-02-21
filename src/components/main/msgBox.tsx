@@ -72,7 +72,7 @@ const MsgBox = () => {
             <div className="flex justify-end">
               <Bubble
                 className="bg-transparent"
-                classNames={{ content: "!rounded-full !bg-[#eff6ff]" }}
+                classNames={{ content: "!rounded-2xl !bg-[#eff6ff]" }}
                 content={item.content}
               />
             </div>
