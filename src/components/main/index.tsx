@@ -1,14 +1,15 @@
 import styled from "styled-components";
 import Footer from "./footer";
-import { useChatStore } from "@/store";
+import { useChatStore, useUiStore } from "@/store";
 import MsgBox from "./msgBox";
 import Welcome from "./welcome";
 const Main = () => {
   const { items, id } = useChatStore.currentChat();
+  const { isRightSidebarOpen } = useUiStore.useRightSidebar();
   const { list } = useChatStore.chatList();
   const title = list.find((item) => item.id === id)?.title || "";
   return (
-    <div className="flex flex-col md:pt-5 pt-5 relative md:w-[800px]  mx-auto h-full justify-center">
+    <div className={`flex flex-col md:pt-5 pt-5 relative ${isRightSidebarOpen ? "md:w-[800px] w-0" : "md:w-[800px]"}  mx-auto h-full justify-center`}>
       {items.length === 0 ? (
         <Welcome />
       ) : (
