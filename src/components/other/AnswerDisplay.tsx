@@ -82,7 +82,9 @@ const AnswerDisplay = ({ msg, index }: AnswerDisplayProps) => {
           ) : (
             <img
               onClick={() => {
-                copyToClipboard(msg?.content ?? "");
+                copyToClipboard(
+                  (msg?.thinkingPart ?? "") + (msg?.answerPart ?? "")
+                );
                 updateItem({ id: msg.id, copied: true });
                 setTimeout(() => {
                   updateItem({ id: msg.id, copied: false });

@@ -8,7 +8,7 @@
 }
 @layer components {
   .prose blockquote {
-    @apply text-sm !mt-2 !mb-2;
+    @apply text-sm !mt-2 !mb-2 !not-italic;
   }
 }
 .anticon-spin::before,
