@@ -11,6 +11,7 @@ import { useMedia } from "react-use";
 import styled from "styled-components";
 import newChatBlue from "@/assets/imgs/newChatBlue.png";
 import ChatList from "./chatList";
+import { consts } from "@/utils";
 // 展开的侧边栏
 interface WideSidebarProps {
   close: () => void;
@@ -27,7 +28,7 @@ export const WideSidebar: React.FC<WideSidebarProps> = ({
     navigate("/");
   };
   const createNew = () => {
-    if (answerStatus !== 2) {
+    if (answerStatus !== consts.AnswerStatus.Ended) {
       return;
     }
     createNewChat();
@@ -49,7 +50,9 @@ export const WideSidebar: React.FC<WideSidebarProps> = ({
       <div className="newChat">
         <div
           className={`btnBox ${
-            answerStatus !== 2 ? "cursor-not-allowed" : "cursor-pointer"
+            answerStatus !== consts.AnswerStatus.Ended
+              ? "cursor-not-allowed"
+              : "cursor-pointer"
           }`}
           onClick={createNew}
         >
@@ -73,7 +76,7 @@ const SideBar: React.FC = () => {
     navigate("/");
   };
   const createNew = () => {
-    if (answerStatus !== 2) {
+    if (answerStatus !== consts.AnswerStatus.Ended) {
       return;
     }
     createNewChat();
@@ -164,4 +167,3 @@ const WideContainer = styled.div<{ $showTitle: boolean; $isPC: boolean }>`
     }
   }
 `;
-

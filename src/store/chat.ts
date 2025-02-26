@@ -1,10 +1,16 @@
 import { create } from "zustand";
-
+import { consts } from "@/utils";
 export const currentChat = create<Chat.CurrentChatState>((set) => ({
   id: "",
   items: [],
-  answerStatus: 2,
+  answerStatus: consts.AnswerStatus.Ended,
   needScroll: false,
+  outputStatus: "answerEnded",
+  thinkingDefaultActiveKey: [],
+  setOutputStatus: (status: "thinking" | "answering" | "answerEnded") =>
+    set(() => ({ outputStatus: status })),
+  setThinkingDefaultActiveKey: (key: string[]) =>
+    set(() => ({ thinkingDefaultActiveKey: key })),
   addItem: (newItem) =>
     set((state) => ({
       items: [...state.items, newItem],
@@ -14,14 +20,15 @@ export const currentChat = create<Chat.CurrentChatState>((set) => ({
       items: state.items.filter((item) => item.id !== itemId),
     })),
   // addLastContent
-  addLastContent: (content) => {
+  addLastContent: ({ thinkingPart, answerPart }) => {
     set((state) => ({
       items: state.items.map((item, index) => {
         const lastIndex = state.items.length - 1;
         if (lastIndex === index) {
           return {
             ...item,
-            content: item.content + content,
+            thinkingPart: (item?.thinkingPart ?? "") + thinkingPart,
+            answerPart: (item?.answerPart ?? "") + answerPart,
           };
         } else {
           return item;
@@ -39,10 +46,6 @@ export const currentChat = create<Chat.CurrentChatState>((set) => ({
     set(() => ({
       items: newItems,
     })),
-  clearItems: () =>
-    set(() => ({
-      items: [],
-    })),
   // 清楚当前及以后的聊天记录
   clearAfter: (id: string) => {
     set((state) => {
@@ -56,14 +59,13 @@ export const currentChat = create<Chat.CurrentChatState>((set) => ({
       }
     });
   },
-  finishAsk: () => set(() => ({ answerStatus: 0 })),
-  startAnswer: () => set(() => ({ answerStatus: 1 })),
-  endAnswer: () => set(() => ({ answerStatus: 2 })),
+  setAnswerStatus: (status: AnswerStatus) =>
+    set(() => ({ answerStatus: status })),
   setNeedScroll: (needScroll: boolean) => set(() => ({ needScroll })),
   createNewChat: () => {
     set(() => ({
       items: [],
-      answerStatus: 2,
+      answerStatus: consts.AnswerStatus.Ended,
       needScroll: false,
       id: "",
     }));

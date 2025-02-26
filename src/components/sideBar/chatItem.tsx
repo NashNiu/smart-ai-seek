@@ -4,6 +4,7 @@ import type { MenuProps } from "antd";
 import { Dropdown, Input, App } from "antd";
 import styled from "styled-components";
 import { useState } from "react";
+import { consts } from "@/utils";
 
 const ChatItem = ({ item }: { item: Chat.HistoryListItem }) => {
   const { modal } = App.useApp();
@@ -68,18 +69,39 @@ const ChatItem = ({ item }: { item: Chat.HistoryListItem }) => {
   };
   const onItemClick = () => {
     // 正在回答
-    if (answerStatus !== 2) return;
+    if (answerStatus !== consts.AnswerStatus.Ended) return;
     setCurrentChatId(item.id);
     const currentChat = localStorage.getItem(item.id);
     if (currentChat) {
-      setItems(JSON.parse(currentChat));
+      const currentChatList = JSON.parse(currentChat);
+      setItems(
+        currentChatList.map((item: Chat.MsgItem) => {
+          if (item.role === "user") {
+            return item;
+          } else {
+            if (item.thinkingPart && item.answerPart) {
+              return item;
+            }
+            return {
+              ...item,
+              thinkingPart:
+                "<blockquote>" +
+                item.content?.split("</think>")[0]?.replace("<think>", "") +
+                "</blockquote>",
+              answerPart: item.content?.split("</think>")[1],
+            };
+          }
+        })
+      );
     }
   };
   return (
     <ChatItemWrapper
       onClick={onItemClick}
       className={`${isActive ? "active" : ""} ${
-        answerStatus !== 2 ? "cursor-not-allowed" : "group cursor-pointer"
+        answerStatus !== consts.AnswerStatus.Ended
+          ? "cursor-not-allowed"
+          : "group cursor-pointer"
       } `}
     >
       {item.editable ? (
@@ -131,4 +153,3 @@ const ChatItemWrapper = styled.div`
     background-color: #dbeafe;
   }
 `;
-

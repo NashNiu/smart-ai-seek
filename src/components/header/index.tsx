@@ -4,11 +4,13 @@ import { Drawer } from "antd";
 import { WideSidebar } from "../sideBar";
 import { useState } from "react";
 import { useChatStore } from "@/store";
+import { consts } from "@/utils";
+
 const App = () => {
   const [collapse, setCollapse] = useState(false);
   const { createNewChat, answerStatus } = useChatStore.currentChat();
   const createNew = () => {
-    if (answerStatus !== 2) {
+    if (answerStatus !== consts.AnswerStatus.Ended) {
       return;
     }
     createNewChat();
@@ -43,4 +45,3 @@ const App = () => {
 };
 
 export default App;
-

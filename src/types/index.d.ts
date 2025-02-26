@@ -2,6 +2,8 @@ declare namespace Chat {
   interface MsgItem {
     id: string;
     content?: string;
+    thinkingPart?: string;
+    answerPart?: string;
     role: "user" | "assistant";
     copied?: boolean;
     type?: "text-input" | "img-sys-input" | "pdf-input" | "duckgo-input";
@@ -12,24 +14,34 @@ declare namespace Chat {
     id: string;
     // 当前会话数据
     items: MsgItem[];
-    // 回答状态 0未开始(已提问，未开始)，1 进行中，2 结束(已回答)
-    answerStatus: number;
+    answerStatus: AnswerStatus;
     // 是否需要滚动内容
     needScroll: boolean;
+    // 输出状态
+    outputStatus: "thinking" | "answering" | "answerEnded";
+    // 思考过程默认显示的key
+    thinkingDefaultActiveKey: string[];
     addItem: (newItem: MsgItem) => void;
     removeItem: (itemId: string) => void;
     updateItem: (data: Partial<MsgItem>) => void;
+    // 设置输出状态
+    setOutputStatus: (status: "thinking" | "answering" | "answerEnded") => void;
+    // 设置思考过程默认显示的key
+    setThinkingDefaultActiveKey: (key: string[]) => void;
     // 给最后一条增加内容
-    addLastContent: (content: string) => void;
+    addLastContent: ({
+      thinkingPart,
+      answerPart,
+    }: {
+      thinkingPart?: string;
+      answerPart?: string;
+    }) => void;
+    // 设置聊天记录
     setItems: (newItems: MsgItem[]) => void;
-    clearItems: () => void;
+    // 清楚当前及以后的聊天记录
     clearAfter: (index: string) => void;
-    // 提问完
-    finishAsk: () => void;
-    // 开始回答
-    startAnswer: () => void;
-    // 结束回答
-    endAnswer: () => void;
+    // 设置回答状态
+    setAnswerStatus: (status: AnswerStatus) => void;
     // 设置是否需要滚动
     setNeedScroll: (needScroll: boolean) => void;
     // 创建新聊天
@@ -58,4 +70,14 @@ declare namespace Chat {
     setIsSearch: (isSearch: boolean) => void;
     toggleSearch: () => void;
   }
+}
+
+declare enum AnswerStatus {
+  // NotStarted = 0,
+  Asked = 1,
+  StartAnswer = 2,
+  Thinking = 3,
+  ThinkingEnded = 4,
+  Answering = 5,
+  Ended = 6,
 }

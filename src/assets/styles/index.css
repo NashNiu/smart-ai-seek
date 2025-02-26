@@ -6,7 +6,12 @@
     max-width: 80ch;
   }
 }
-
-.anticon-spin::before, .anticon-spin {
+@layer components {
+  .prose blockquote {
+    @apply text-sm !mt-2 !mb-2;
+  }
+}
+.anticon-spin::before,
+.anticon-spin {
   display: inline-flex;
 }

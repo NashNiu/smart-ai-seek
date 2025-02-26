@@ -10,11 +10,12 @@ import { useEffect, useRef, useState, useContext } from "react";
 import { useMedia } from "react-use";
 import styled, { css } from "styled-components";
 import { useChatStore } from "@/store";
-import { tools } from "@/utils";
+import { tools, consts } from "@/utils";
 import { SocketContext } from "@/hooks";
 import { UploadFile } from "antd";
 import pdfImg from "@/assets/imgs/pdf.png";
 import picImg from "@/assets/imgs/pic.png";
+
 interface InputAreaProps {
   footerResize?: () => void;
 }
@@ -30,11 +31,11 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
     addItem,
     answerStatus,
     setNeedScroll,
-    finishAsk,
     id: currentChatId,
     setCurrentChatId,
     items: currentChatItems,
-    endAnswer,
+    setAnswerStatus,
+    setOutputStatus,
   } = useChatStore.currentChat();
   const [fileList, setFileList] = useState<UploadFile<UploadResponse>[]>([]);
   const { addChat } = useChatStore.chatList();
@@ -81,11 +82,11 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
     // setFileList(newFileList);
   };
   const onSend = () => {
-    if (answerStatus !== 2) {
+    if (answerStatus !== consts.AnswerStatus.Ended) {
       return;
     }
-    finishAsk();
-
+    setAnswerStatus(consts.AnswerStatus.Asked);
+    setOutputStatus("thinking");
     const params: any = {
       text: inputValue,
     };
@@ -145,7 +146,7 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
   };
   // 停止生成
   const stopGenerate = () => {
-    endAnswer();
+    setAnswerStatus(consts.AnswerStatus.Ended);
     sendMessage({
       type: "interrupt-signal",
     });
@@ -266,7 +267,7 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
                 </Button>
               </Upload>
             </Tooltip>
-            {answerStatus < 2 ? (
+            {answerStatus < consts.AnswerStatus.Ended ? (
               <Tooltip title="停止生成">
                 <div
                   className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center cursor-pointer"

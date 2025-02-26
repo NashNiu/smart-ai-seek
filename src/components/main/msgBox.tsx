@@ -1,19 +1,15 @@
-import copyImg from "@/assets/imgs/copy.png";
 import logoImg from "@/assets/imgs/logo.png";
-import reloadImg from "@/assets/imgs/reload.png";
+import pdfImg from "@/assets/imgs/pdf.png";
+import picImg from "@/assets/imgs/pic.png";
+import AnswerDisplay from "@/components/other/AnswerDisplay";
 import TypewriterMarkdown from "@/components/other/TypewriterMarkdown";
 import { useChatStore, useUiStore } from "@/store";
-import { tools } from "@/utils";
+import { consts } from "@/utils";
+import { LoadingOutlined } from "@ant-design/icons";
 import { Bubble } from "@ant-design/x";
-import { Spin, Tooltip } from "antd";
-import markdownit from "markdown-it";
-import { useEffect, useRef, useState, useContext } from "react";
+import { Collapse, Spin } from "antd";
+import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { useCopyToClipboard } from "react-use";
-import { CheckOutlined } from "@ant-design/icons";
-import { SocketContext } from "@/hooks";
-import picImg from "@/assets/imgs/pic.png";
-import pdfImg from "@/assets/imgs/pdf.png";
 
 const MsgBox = () => {
   const {
@@ -22,19 +18,16 @@ const MsgBox = () => {
     needScroll,
     setNeedScroll,
     answerStatus,
-    updateItem,
-    clearAfter,
-    finishAsk,
+    outputStatus,
+    setOutputStatus,
+    thinkingDefaultActiveKey,
+    setThinkingDefaultActiveKey,
   } = useChatStore.currentChat();
-  const { isSearch } = useChatStore.askState();
   const { height: footerHeight } = useUiStore.useFooterHeight();
-  const { sendMessage } = useContext(SocketContext);
-  const md = markdownit({ html: true });
   const containerRef = useRef<HTMLDivElement>(null);
-  // 正在输出答案
-  const [isTyping, setIsTyping] = useState(false);
-  // 复制
-  const [, copyToClipboard] = useCopyToClipboard();
+  const [activeKey, setActiveKey] = useState<string[]>(
+    thinkingDefaultActiveKey
+  );
 
   // 滚动到最底部
   const scrollToBottom = () => {
@@ -46,16 +39,7 @@ const MsgBox = () => {
       setNeedScroll(false);
     }
   };
-  // 重新生成
-  const regenerate = (id: string, index: number) => {
-    clearAfter(id);
-    const content = items[index - 1].content;
-    finishAsk();
-    sendMessage({
-      text: content,
-      type: isSearch ? "duckgo-input" : "text-input",
-    });
-  };
+
   useEffect(() => {
     if (needScroll) {
       scrollToBottom();
@@ -115,67 +99,101 @@ const MsgBox = () => {
           ) : (
             <div className="flex justify-start items-start gap-4">
               <img src={logoImg} alt="avatar" />
-              {answerStatus !== 0 || index !== items.length - 1 ? (
-                <div className="prose">
-                  {/* 回答中, 最后一个，正在输出 */}
-                  {(answerStatus === 1 || isTyping) &&
-                  index === items.length - 1 ? (
-                    <>
-                      <Spin />
-                      <TypewriterMarkdown
-                        onTypeStateChange={setIsTyping}
-                        content={item?.content ?? ""}
-                        delay={5}
-                      />
-                    </>
+
+              {/* 最后一条 */}
+              {index === items.length - 1 && (
+                <>
+                  {answerStatus === consts.AnswerStatus.Ended &&
+                  outputStatus === "answerEnded" ? (
+                    <AnswerDisplay index={index} msg={item} />
                   ) : (
-                    <>
-                      <div
-                        dangerouslySetInnerHTML={{
-                          __html: md.render(
-                            tools.convertThinkTagToBlockquote(
-                              item?.content ?? ""
-                            )
-                          ),
+                    <div className="prose">
+                      <Collapse
+                        bordered={false}
+                        expandIconPosition="end"
+                        accordion
+                        activeKey={activeKey}
+                        onChange={(key) => {
+                          setActiveKey(key);
+                          setThinkingDefaultActiveKey(key);
                         }}
-                      ></div>
-                      <div className="flex gap-2 h-6">
-                        <Tooltip title="复制">
-                          {item.copied ? (
-                            <CheckOutlined className="cursor-pointer w-5 h-5 mt-0 mb-0" />
-                          ) : (
-                            <img
-                              onClick={() => {
-                                copyToClipboard(item?.content ?? "");
-                                updateItem({ id: item.id, copied: true });
-                                setTimeout(() => {
-                                  updateItem({ id: item.id, copied: false });
-                                }, 2000);
-                              }}
-                              className="cursor-pointer w-5 h-5 mt-0 mb-0"
-                              src={copyImg}
-                              alt=""
-                            />
-                          )}
-                        </Tooltip>
-                        <Tooltip title="重新生成">
-                          <img
-                            onClick={() => {
-                              regenerate(item.id, index);
+                        items={[
+                          {
+                            key: "1",
+                            label: (
+                              <div className="text-gray-600 text-sm">
+                                {answerStatus === consts.AnswerStatus.Asked ? (
+                                  <Spin indicator={<LoadingOutlined spin />} />
+                                ) : (
+                                  <span>
+                                    {outputStatus === "thinking"
+                                      ? "思考中..."
+                                      : "已深度思考"}
+                                  </span>
+                                )}
+                              </div>
+                            ),
+                            children: (
+                              <TypewriterMarkdown
+                                onFinish={(state) => {
+                                  if (state) {
+                                    if (
+                                      window.currentAnswerType !== "thinking"
+                                    ) {
+                                      setOutputStatus("answering");
+                                    } else {
+                                      setOutputStatus("thinking");
+                                    }
+                                  } else {
+                                    setOutputStatus("thinking");
+                                  }
+                                }}
+                                content={item?.thinkingPart ?? ""}
+                                delay={30}
+                              />
+                            ),
+                            classNames: {
+                              header: "!inline-flex",
+                            },
+                            forceRender: true,
+                          },
+                        ]}
+                      />
+                      {outputStatus === "answering" &&
+                        [
+                          consts.AnswerStatus.ThinkingEnded,
+                          consts.AnswerStatus.StartAnswer,
+                          consts.AnswerStatus.Ended,
+                        ].includes(answerStatus) && (
+                          <TypewriterMarkdown
+                            onFinish={(state) => {
+                              if (state) {
+                                if (window.currentAnswerType === "ended") {
+                                  setOutputStatus("answerEnded");
+                                } else {
+                                  setOutputStatus("answering");
+                                }
+                              } else {
+                                setOutputStatus("answering");
+                              }
                             }}
-                            className="cursor-pointer w-5 h-5 mt-0 mb-0"
-                            src={reloadImg}
-                            alt=""
+                            content={item?.answerPart ?? ""}
+                            delay={30}
                           />
-                        </Tooltip>
-                      </div>
-                    </>
+                        )}
+                      {(outputStatus === "thinking" ||
+                        outputStatus === "answering") && (
+                        <div className="mb-2">
+                          <Spin indicator={<LoadingOutlined spin />} />
+                        </div>
+                      )}
+                    </div>
                   )}
-                </div>
-              ) : (
-                <div className="mt-2">
-                  <Spin />
-                </div>
+                </>
+              )}
+              {/* 不是最后一条 */}
+              {index !== items.length - 1 && (
+                <AnswerDisplay index={index} msg={item} />
               )}
             </div>
           )}

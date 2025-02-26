@@ -1,5 +1,4 @@
 import { useChatStore } from "@/store";
-import { tools } from "@/utils";
 import markdownit from "markdown-it";
 import { useEffect, useRef, useState } from "react";
 
@@ -8,12 +7,12 @@ const md = markdownit({ html: true });
 interface TypewriterMarkdownProps {
   content: string;
   delay?: number;
-  onTypeStateChange?: (state: boolean) => void;
+  onFinish?: (state: boolean) => void;
 }
 const TypewriterMarkdown = ({
   content,
-  delay = 100,
-  onTypeStateChange,
+  delay = 30,
+  onFinish,
 }: TypewriterMarkdownProps) => {
   const { setNeedScroll } = useChatStore.currentChat();
   const [fullContent, setFullContent] = useState(""); // 完整内容
@@ -32,18 +31,21 @@ const TypewriterMarkdown = ({
     const processNextChar = () => {
       if (currentIndexRef.current < fullContent.length) {
         setDisplayedContent((prev) => {
-          // 拼接下一个字符
-          const nextChar = fullContent[currentIndexRef.current];
-          currentIndexRef.current++;
-          return prev + nextChar;
+          // 每次拼接3个字符
+          const nextChars = fullContent.slice(
+            currentIndexRef.current,
+            currentIndexRef.current + 3
+          );
+          currentIndexRef.current += 3;
+          return prev + nextChars;
         });
         setNeedScroll(true);
         // 递归调用，设置下一次触发
         timeoutRef.current = setTimeout(processNextChar, delay);
-        onTypeStateChange?.(true);
+        onFinish?.(false);
       } else {
         // 通知外部显示完成
-        onTypeStateChange?.(false);
+        onFinish?.(true);
       }
     };
 
@@ -61,7 +63,7 @@ const TypewriterMarkdown = ({
   }, [fullContent, delay]);
 
   // 将拼接后的 Markdown 转换为 HTML
-  const html = md.render(tools.convertThinkTagToBlockquote(displayedContent));
+  const html = md.render(displayedContent);
   // 渲染结果
   return <div dangerouslySetInnerHTML={{ __html: html }} />;
 };
