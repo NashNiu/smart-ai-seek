@@ -147,6 +147,7 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
   // 停止生成
   const stopGenerate = () => {
     setAnswerStatus(consts.AnswerStatus.Ended);
+    setOutputStatus("answerEnded");
     sendMessage({
       type: "interrupt-signal",
     });
