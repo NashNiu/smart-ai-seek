@@ -8,7 +8,7 @@ const Main = () => {
   const { list } = useChatStore.chatList();
   const title = list.find((item) => item.id === id)?.title || "";
   return (
-    <div className="flex flex-col md:pt-5 pt-5 relative max-w-[800px] mx-auto h-full justify-center">
+    <div className="flex flex-col md:pt-5 pt-5 relative md:w-[800px]  mx-auto h-full justify-center">
       {items.length === 0 ? (
         <Welcome />
       ) : (

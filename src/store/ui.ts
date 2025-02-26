@@ -24,3 +24,28 @@ export const useFooterHeight = create<FooterHeightState>((set) => ({
   setHeight: (height: number) => set({ height }),
 }));
 
+
+interface RightSidebarState {
+  isRightSidebarOpen: boolean;
+  toggleRightSidebar: () => void;
+  openRightSidebar: () => void;
+  closeRightSidebar: () => void;
+  fileInfo: {
+    name: string;
+    url: string;
+  };
+  setFileInfo: (fileInfo: { name: string; url: string }) => void;
+}
+
+export const useRightSidebar = create<RightSidebarState>((set) => ({
+  isRightSidebarOpen: false,
+  toggleRightSidebar: () => set((state) => ({ isRightSidebarOpen: !state.isRightSidebarOpen })),
+  openRightSidebar: () => set({ isRightSidebarOpen: true }),
+  closeRightSidebar: () => set({ isRightSidebarOpen: false }),
+  fileInfo: {
+    name: "",
+    url: "",
+  },
+  setFileInfo: (fileInfo: { name: string; url: string }) => set({ fileInfo }),
+}));
+

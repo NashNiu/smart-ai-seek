@@ -8,6 +8,7 @@ declare namespace Chat {
     copied?: boolean;
     type?: "text-input" | "img-sys-input" | "pdf-input" | "duckgo-input";
     fileName?: string;
+    filePath?: string;
     size?: string;
   }
   interface CurrentChatState {

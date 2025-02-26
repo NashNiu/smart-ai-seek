@@ -3,6 +3,7 @@ import Main from "@/components/main";
 import SideBar from "@/components/sideBar";
 import { SocketContext, useSocket } from "@/hooks";
 import { useEffect } from "react";
+import RightSidebar from "@/components/rightSidebar";
 function App() {
   const { initSocket, sendMessage, socket } = useSocket();
   useEffect(() => {
@@ -21,8 +22,9 @@ function App() {
           <div className="hidden md:block">
             <SideBar />
           </div>
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-hidden flex">
             <Main />
+            <RightSidebar />
           </div>
         </div>
       </div>
@@ -31,4 +33,3 @@ function App() {
 }
 
 export default App;
-

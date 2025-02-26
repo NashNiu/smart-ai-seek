@@ -24,10 +24,13 @@ const MsgBox = () => {
     setThinkingDefaultActiveKey,
   } = useChatStore.currentChat();
   const { height: footerHeight } = useUiStore.useFooterHeight();
+  const { setFileInfo } = useUiStore.useRightSidebar();
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeKey, setActiveKey] = useState<string[]>(
     thinkingDefaultActiveKey
   );
+  const [typeFinished, setTypeFinished] = useState(false);
+  const { openRightSidebar } = useUiStore.useRightSidebar();
 
   // 滚动到最底部
   const scrollToBottom = () => {
@@ -39,7 +42,20 @@ const MsgBox = () => {
       setNeedScroll(false);
     }
   };
+  useEffect(() => {
+    if (typeFinished && answerStatus === consts.AnswerStatus.Ended) {
+      setOutputStatus("answerEnded");
+    }
+  }, [typeFinished, answerStatus]);
 
+  // 处理图片点击
+  const handleImageClick = (item: Chat.MsgItem) => {
+    console.log(item);
+    if (item.filePath) {
+      openRightSidebar();
+      setFileInfo({ name: item.fileName ?? "", url: item.filePath ?? "" });
+    }
+  };
   useEffect(() => {
     if (needScroll) {
       scrollToBottom();
@@ -58,7 +74,10 @@ const MsgBox = () => {
             <div>
               {item.type === "img-sys-input" && (
                 <div className="flex justify-end mb-2">
-                  <div className="flex items-center bg-gray-100 rounded-2xl px-4 py-2 gap-2">
+                  <div
+                    onClick={() => handleImageClick(item)}
+                    className="flex items-center bg-gray-100 rounded-2xl px-4 py-2 gap-2 cursor-pointer hover:shadow-md transition-all duration-300"
+                  >
                     <img src={picImg} className="w-6" alt="" />
                     <div className="flex flex-col space-between">
                       <span className="max-w-[250px] overflow-hidden text-ellipsis whitespace-nowrap">
@@ -135,8 +154,8 @@ const MsgBox = () => {
                             ),
                             children: (
                               <TypewriterMarkdown
-                                onFinish={(state) => {
-                                  if (state) {
+                                onFinish={(finished) => {
+                                  if (finished) {
                                     if (
                                       window.currentAnswerType !== "thinking"
                                     ) {
@@ -166,8 +185,9 @@ const MsgBox = () => {
                           consts.AnswerStatus.Ended,
                         ].includes(answerStatus) && (
                           <TypewriterMarkdown
-                            onFinish={(state) => {
-                              if (state) {
+                            onFinish={(finished) => {
+                              if (finished) {
+                                setTypeFinished(true);
                                 if (window.currentAnswerType === "ended") {
                                   setOutputStatus("answerEnded");
                                 } else {
@@ -183,7 +203,12 @@ const MsgBox = () => {
                         )}
                       {(outputStatus === "thinking" ||
                         outputStatus === "answering") && (
-                        <div className="mb-2">
+                        <div
+                          className="mb-2"
+                          onClick={() => {
+                            console.log(outputStatus);
+                          }}
+                        >
                           <Spin indicator={<LoadingOutlined spin />} />
                         </div>
                       )}

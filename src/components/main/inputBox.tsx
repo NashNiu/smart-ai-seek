@@ -105,6 +105,7 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
           params.pdf = fileList[0].response?.url;
           msgItem.type = "pdf-input";
           msgItem.fileName = fileList[0].name;
+          msgItem.filePath = fileList[0].response?.url;
           msgItem.size = tools.formatFileSize(fileList[0].size || 0);
         } else {
           // 本地
@@ -116,6 +117,7 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
           //   "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png";
           msgItem.type = "img-sys-input";
           msgItem.fileName = fileList[0].name;
+          msgItem.filePath = fileList[0].response?.url;
           msgItem.size = tools.formatFileSize(fileList[0].size || 0);
         }
       } else {
