@@ -178,6 +178,7 @@ const MsgBox = () => {
                             children: (
                               <TypewriterMarkdown
                                 onFinish={(finished) => {
+                                  setTypeFinished(false);
                                   if (finished) {
                                     if (
                                       window.currentAnswerType !== "thinking"
@@ -209,8 +210,8 @@ const MsgBox = () => {
                         ].includes(answerStatus) && (
                           <TypewriterMarkdown
                             onFinish={(finished) => {
+                              setTypeFinished(finished);
                               if (finished) {
-                                setTypeFinished(true);
                                 if (window.currentAnswerType === "ended") {
                                   setOutputStatus("answerEnded");
                                 } else {
@@ -226,12 +227,7 @@ const MsgBox = () => {
                         )}
                       {(outputStatus === "thinking" ||
                         outputStatus === "answering") && (
-                        <div
-                          className="mb-2"
-                          onClick={() => {
-                            console.log(outputStatus);
-                          }}
-                        >
+                        <div className="mb-2">
                           <Spin indicator={<LoadingOutlined spin />} />
                         </div>
                       )}

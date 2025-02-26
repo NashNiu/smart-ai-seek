@@ -34,9 +34,9 @@ const TypewriterMarkdown = ({
           // 每次拼接3个字符
           const nextChars = fullContent.slice(
             currentIndexRef.current,
-            currentIndexRef.current + 1
+            currentIndexRef.current + 3
           );
-          currentIndexRef.current += 1;
+          currentIndexRef.current += 3;
           return prev + nextChars;
         });
         setNeedScroll(true);
