@@ -24,13 +24,12 @@ const MsgBox = () => {
     setThinkingDefaultActiveKey,
   } = useChatStore.currentChat();
   const { height: footerHeight } = useUiStore.useFooterHeight();
-  const { setFileInfo } = useUiStore.useRightSidebar();
+  const { setFileInfo, openRightSidebar } = useUiStore.useRightSidebar();
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeKey, setActiveKey] = useState<string[]>(
     thinkingDefaultActiveKey
   );
   const [typeFinished, setTypeFinished] = useState(false);
-  const { openRightSidebar } = useUiStore.useRightSidebar();
   const [userScrolling, setUserScrolling] = useState(false);
 
   // 滚动到最底部

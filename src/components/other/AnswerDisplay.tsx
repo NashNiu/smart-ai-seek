@@ -28,18 +28,24 @@ const AnswerDisplay = ({ msg, index }: AnswerDisplayProps) => {
   const [activeKey, setActiveKey] = useState(thinkingDefaultActiveKey);
   const { sendMessage } = useContext(SocketContext);
   const md = markdownit({ html: true });
-  const { isSearch } = useChatStore.askState();
   const [, copyToClipboard] = useCopyToClipboard();
   // 重新生成
   const regenerate = (id: string, index: number) => {
+    const item = items[index - 1];
+    const params: any = {
+      text: item.content,
+      type: item.type,
+    };
+    if (item.type === "pdf-input") {
+      params.pdf = item.filePath;
+    }
+    if (item.type === "img-sys-input") {
+      params.image = item.filePath;
+    }
     clearAfter(id);
-    const content = items[index - 1].content;
     setAnswerStatus(consts.AnswerStatus.Asked);
     setOutputStatus("thinking");
-    sendMessage({
-      text: content,
-      type: isSearch ? "duckgo-input" : "text-input",
-    });
+    sendMessage(params);
   };
   return (
     <div className="prose">
