@@ -31,6 +31,7 @@ const MsgBox = () => {
   );
   const [typeFinished, setTypeFinished] = useState(false);
   const { openRightSidebar } = useUiStore.useRightSidebar();
+  const [userScrolling, setUserScrolling] = useState(false);
 
   // 滚动到最底部
   const scrollToBottom = () => {
@@ -57,15 +58,38 @@ const MsgBox = () => {
     }
   };
   useEffect(() => {
-    if (needScroll) {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (e.deltaY < 0) {
+        // 向上滚动
+        setUserScrolling(true);
+        setNeedScroll(false);
+      }
+    };
+
+    container.addEventListener("wheel", handleWheel);
+    return () => container.removeEventListener("wheel", handleWheel);
+  }, [setNeedScroll]);
+
+  useEffect(() => {
+    if (needScroll && !userScrolling) {
       scrollToBottom();
     }
-  }, [needScroll]);
+  }, [needScroll, userScrolling]);
+
   useEffect(() => {
     if (items.length > 0) {
       localStorage.setItem(currentChatId, JSON.stringify(items));
     }
   }, [items]);
+  useEffect(() => {
+    if (items.length > 0) {
+      setUserScrolling(false);
+    }
+  }, [items.length]);
+
   return (
     <Container style={{ paddingBottom: footerHeight }} ref={containerRef}>
       {items.map((item, index) => (

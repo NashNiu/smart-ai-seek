@@ -6,7 +6,7 @@ export const currentChat = create<Chat.CurrentChatState>((set) => ({
   answerStatus: consts.AnswerStatus.Ended,
   needScroll: false,
   outputStatus: "answerEnded",
-  thinkingDefaultActiveKey: [],
+  thinkingDefaultActiveKey: ["1"],
   setOutputStatus: (status: "thinking" | "answering" | "answerEnded") =>
     set(() => ({ outputStatus: status })),
   setThinkingDefaultActiveKey: (key: string[]) =>
