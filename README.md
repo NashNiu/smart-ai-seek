@@ -1,33 +1,28 @@
-# SmartSeek 智能搜索
+# SmartSeek
 
-## 分支
-
-- `master` 正式环境
-- `dev` 测试环境
-
-## 环境
+## Environment
 
 node `20.9.0`
 
-装包:
+Install dependencies:
 
 ```bash
 yarn install
 ```
 
-### 启动
+### Development
 
 ```bash
 yarn dev
 ```
 
-### 编译
+### Build
 
 ```bash
 yarn build
 ```
 
-### 检查代码
+### Lint
 
 ```bash
 yarn lint

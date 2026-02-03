@@ -19,12 +19,12 @@ const ChatItem = ({ item }: { item: Chat.HistoryListItem }) => {
   const isActive = currentChatId === item.id;
   const menuConfig: MenuProps["items"] = [
     {
-      label: "重命名",
+      label: "Rename",
       key: "1",
       icon: <EditOutlined />,
     },
     {
-      label: "删除",
+      label: "Delete",
       key: "2",
       icon: <DeleteOutlined />,
       danger: true,
@@ -43,12 +43,12 @@ const ChatItem = ({ item }: { item: Chat.HistoryListItem }) => {
       });
     }
     if (key === "2") {
-      // 删除
+      // Delete
       modal.confirm({
-        title: "确认删除",
-        content: "确定要删除这个对话吗？",
-        okText: "确定",
-        cancelText: "取消",
+        title: "Confirm Delete",
+        content: "Are you sure you want to delete this conversation?",
+        okText: "Confirm",
+        cancelText: "Cancel",
         onOk: () => {
           removeChat(id);
           if (currentChatId === id) {
@@ -68,7 +68,7 @@ const ChatItem = ({ item }: { item: Chat.HistoryListItem }) => {
     });
   };
   const onItemClick = () => {
-    // 正在回答
+    // Answering in progress
     if (answerStatus !== consts.AnswerStatus.Ended) return;
     setCurrentChatId(item.id);
     const currentChat = localStorage.getItem(item.id);

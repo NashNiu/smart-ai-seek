@@ -12,7 +12,7 @@ import styled from "styled-components";
 import newChatBlue from "@/assets/imgs/newChatBlue.png";
 import ChatList from "./chatList";
 import { consts } from "@/utils";
-// 展开的侧边栏
+// Expanded sidebar
 interface WideSidebarProps {
   close: () => void;
   showTitle: boolean;
@@ -57,7 +57,7 @@ export const WideSidebar: React.FC<WideSidebarProps> = ({
           onClick={createNew}
         >
           <img src={newChatBlue} className="w-[24px]" alt="" />
-          <span>开启新对话</span>
+          <span>Start New Chat</span>
         </div>
       </div>
       <div className="overflow-y-auto flex-1">
@@ -86,7 +86,7 @@ const SideBar: React.FC = () => {
       {collapse ? (
         <div className="menuBox">
           <img className="w-[28px]" src={logoImg} onClick={goHome} alt="" />
-          <Tooltip title="打开边栏" placement="right">
+          <Tooltip title="Open Sidebar" placement="right">
             <img
               className="w-[28px]"
               src={openImg}
@@ -94,7 +94,7 @@ const SideBar: React.FC = () => {
               onClick={openCollapse}
             />
           </Tooltip>
-          <Tooltip title="开启新对话" placement="right">
+          <Tooltip title="Start New Chat" placement="right">
             <img
               className="w-[24px]"
               src={newChatImg}

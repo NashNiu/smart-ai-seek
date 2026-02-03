@@ -15,8 +15,8 @@ const TypewriterMarkdown = ({
   onFinish,
 }: TypewriterMarkdownProps) => {
   const { setNeedScroll } = useChatStore.currentChat();
-  const [fullContent, setFullContent] = useState(""); // 完整内容
-  const [displayedContent, setDisplayedContent] = useState(""); // 当前显示内容
+  const [fullContent, setFullContent] = useState(""); // Full content
+  const [displayedContent, setDisplayedContent] = useState(""); // Currently displayed content
   const currentIndexRef = useRef(0); // 当前显示位置
   const timeoutRef = useRef<number | null>(null); // 定时器
 

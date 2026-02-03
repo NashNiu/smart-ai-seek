@@ -32,7 +32,7 @@ const MsgBox = () => {
   const [typeFinished, setTypeFinished] = useState(false);
   const [userScrolling, setUserScrolling] = useState(false);
 
-  // 滚动到最底部
+  // Scroll to bottom
   const scrollToBottom = () => {
     if (containerRef.current) {
       containerRef.current.scrollTo({
@@ -48,7 +48,7 @@ const MsgBox = () => {
     }
   }, [typeFinished, answerStatus]);
 
-  // 处理图片点击
+  // Handle image click
   const handleImageClick = (item: Chat.MsgItem) => {
     console.log(item);
     if (item.filePath) {
@@ -62,7 +62,7 @@ const MsgBox = () => {
 
     const handleWheel = (e: WheelEvent) => {
       if (e.deltaY < 0) {
-        // 向上滚动
+        // Scroll up
         setUserScrolling(true);
         setNeedScroll(false);
       }
@@ -142,7 +142,7 @@ const MsgBox = () => {
             <div className="flex justify-start items-start gap-4">
               <img src={logoImg} alt="avatar" />
 
-              {/* 最后一条 */}
+              {/* Last item */}
               {index === items.length - 1 && (
                 <>
                   {answerStatus === consts.AnswerStatus.Ended &&
@@ -169,8 +169,8 @@ const MsgBox = () => {
                                 ) : (
                                   <span>
                                     {outputStatus === "thinking"
-                                      ? "思考中..."
-                                      : "已深度思考"}
+                                      ? "Thinking..."
+                                      : "Deep thinking completed"}
                                   </span>
                                 )}
                               </div>
@@ -235,7 +235,7 @@ const MsgBox = () => {
                   )}
                 </>
               )}
-              {/* 不是最后一条 */}
+              {/* Not the last item */}
               {index !== items.length - 1 && (
                 <AnswerDisplay index={index} msg={item} />
               )}
@@ -255,7 +255,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
-  // 去掉滚动条
+  // Remove scrollbar
   &::-webkit-scrollbar {
     display: none;
   }

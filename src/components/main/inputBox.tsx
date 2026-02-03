@@ -47,12 +47,12 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
   const [canSend, setCanSend] = useState(false);
   const isPC = useMedia("(min-width: 768px)");
   const uploadTip = isSearch ? (
-    "联网搜索不支持文件上传"
+    "File upload is not supported in web search mode"
   ) : (
     <div>
-      <div>上传附件(仅识别文字)</div>
+      <div>Upload attachment (text only)</div>
       <div className="text-[12px] text-gray-300">
-        最多1个,最大1M,支持图片和PDF
+        Max 1 file, 1MB max, supports images and PDF
       </div>
     </div>
   );
@@ -72,7 +72,7 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
   };
   const beforeUpload = (file: File) => {
     if (file.size > 1024 * 1024) {
-      message.error("文件大小不能超过1M");
+      message.error("File size cannot exceed 1MB");
       return Upload.LIST_IGNORE;
     }
     return true;
@@ -146,7 +146,7 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
     }
     setNeedScroll(true);
   };
-  // 停止生成
+  // Stop generation
   const stopGenerate = () => {
     setAnswerStatus(consts.AnswerStatus.Ended);
     setOutputStatus("answerEnded");
@@ -168,7 +168,7 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
         <AttachContainer>
           {fileList[0]?.type === "application/pdf" && (
             <div className="text-[12px] text-gray-600 pl-2 pb-1">
-              仅识别附件中的文字
+              Text only from attachment
             </div>
           )}
           <div className="flex flex-wrap">
@@ -199,7 +199,7 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
                   </div>
                   <div className="text-[12px] text-gray-500">
                     {item.status === "error" ? (
-                      <span className="text-red-500">解析失败</span>
+                      <span className="text-red-500">Parse failed</span>
                     ) : (
                       <span>{tools.formatFileSize(item.size || 0)} </span>
                     )}
@@ -226,7 +226,7 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
             onChange={(e) => setInputValue(e.target.value)}
             ref={textAreaRef}
             className="textarea"
-            placeholder="请输入内容"
+            placeholder="Please enter content"
             onInput={handleTextInput}
             onKeyDown={handleKeydown}
           />
@@ -235,7 +235,7 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
           <Space>
             <Tooltip
               title={
-                fileList.length ? "请先删除文件再开启联网搜索" : "按需搜索网页"
+                fileList.length ? "Please delete the file first to enable web search" : "Search web as needed"
               }
             >
               <Button
@@ -244,7 +244,7 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
                 onClick={toggleSearch}
                 disabled={fileList.length > 0}
               >
-                联网搜索
+                Web Search
               </Button>
             </Tooltip>
           </Space>
@@ -271,7 +271,7 @@ const InputArea = ({ footerResize }: InputAreaProps) => {
               </Upload>
             </Tooltip>
             {answerStatus < consts.AnswerStatus.Ended ? (
-              <Tooltip title="停止生成">
+              <Tooltip title="Stop generating">
                 <div
                   className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center cursor-pointer"
                   onClick={stopGenerate}
