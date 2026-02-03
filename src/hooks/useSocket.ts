@@ -9,7 +9,7 @@ const useSocket = () => {
   const { setAnswerStatus, addItem, addLastContent, setNeedScroll } =
     currentChat();
   const [socket, setSocket] = useState<ReconnectingWebSocket | null>(null);
-  // 初始化socket
+  // Initialize socket
   const initSocket = () => {
     const url = `${location.protocol === "https:" ? "wss" : "ws"}://${
       location.host
@@ -37,9 +37,9 @@ const useSocket = () => {
             role: "assistant",
             content: "",
           });
-          // 回答开始
+          // Answer started
         } else if (data.text === "conversation-chain-end") {
-          // 回答结束
+          // Answer ended
           setAnswerStatus(consts.AnswerStatus.Ended);
           window.currentAnswerType = "ended";
         }
@@ -50,7 +50,7 @@ const useSocket = () => {
         const thinkingStart = "<blockquote>";
         const thinkEnd = "</blockquote>";
 
-        // 如果内容包含 <think> 则开始思考
+        // If content contains <think>, start thinking
         if (str.includes("<think>")) {
           setAnswerStatus(consts.AnswerStatus.Thinking);
           window.currentAnswerType = "thinking";
@@ -91,12 +91,12 @@ const useSocket = () => {
     };
     setSocket(rws);
   };
-  // 发送消息
+  // Send message
   const sendMessage = (message: any) => {
     if (socket) {
       socket.send(JSON.stringify(message));
     } else {
-      messageApi.error("连接出错，请稍后再试");
+      messageApi.error("Connection error, please try again later");
     }
   };
   return {
