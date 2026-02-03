@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/apis/:path*",
+      "destination": "https://smartseek.ai-mchat.com/apis/:path*"
+    }
+  ]
+}

@@ -17,7 +17,7 @@ const useSocket = () => {
     // const url = "ws://192.168.0.44:9998/magic-ws";
     const rws = new ReconnectingWebSocket(url, [], {
       // connectionTimeout: 1000,
-      // maxRetries: 4,
+      maxRetries: 10,
       // maxReconnectionDelay: 4000,
       // minReconnectionDelay: 10,
     });
