@@ -11,9 +11,8 @@ const useSocket = () => {
   const [socket, setSocket] = useState<ReconnectingWebSocket | null>(null);
   // Initialize socket
   const initSocket = () => {
-    const url = `${location.protocol === "https:" ? "wss" : "ws"}://${
-      location.host
-    }/apis/magic-ws`;
+    // Use environment variable for WebSocket URL
+    const url = import.meta.env.VITE_WS_URL || `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/apis/magic-ws`;
     // const url = "ws://192.168.0.44:9998/magic-ws";
     const rws = new ReconnectingWebSocket(url, [], {
       // connectionTimeout: 1000,
